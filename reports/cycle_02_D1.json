@@ -1,0 +1,193 @@
+{
+  "cycle": 2,
+  "timestamp": 1789128134.9133523,
+  "machine": "SYSTEM",
+  "timeframe": "D1",
+  "csv": "XAUUSD_D1.csv",
+  "total_bars": 4195,
+  "research_bars": 2936,
+  "lockbox_bars": 1259,
+  "research_end": "2021-10-25 20:00:00",
+  "lockbox_start": "2021-10-26 20:00:00",
+  "lockbox_still_sealed": true,
+  "instrument": {
+    "symbol": "XAUUSD",
+    "contract_size": 100.0,
+    "digits": 2,
+    "min_lot": 0.01,
+    "lot_step": 0.01,
+    "max_lot": 100.0,
+    "half_spread": 0.03,
+    "commission_per_lot_per_side": 3.0,
+    "slippage": 0.005,
+    "swap_long_annual": 0.045,
+    "swap_short_annual": 0.01
+  },
+  "cumulative_configs_after": 1448,
+  "hurdle": 0.944,
+  "results": [
+    {
+      "hypothesis": "mtf_alignment",
+      "rationale": "Port of GaganEA's H1+M5 EMA alignment gate. Requiring a slow and fast horizon to agree should cut whipsaw. Tests whether that gate adds value once the fake pattern filter is removed.",
+      "configs": 4,
+      "oos_bars": 1904,
+      "oos_years": 7.556,
+      "oos_sharpe": -0.231,
+      "oos_cagr": -1.515,
+      "max_drawdown_pct": -17.04,
+      "trades": 40,
+      "trades_per_day": 0.021,
+      "win_rate_pct": 25.0,
+      "profit_factor": 0.535,
+      "costs": 256.91,
+      "financing": 846.13,
+      "cost_share_of_gross": null,
+      "deflated_vs_cumulative": -1.176,
+      "beats_hurdle": false,
+      "chosen_per_fold": [
+        {
+          "fold": 0,
+          "lookbacks": [
+            20,
+            80,
+            240
+          ],
+          "mode": "trend",
+          "er": 0.25,
+          "stop_atr": 3.0,
+          "oos_sharpe": 0.179
+        },
+        {
+          "fold": 1,
+          "lookbacks": [
+            20,
+            80,
+            240
+          ],
+          "mode": "trend",
+          "er": 0.25,
+          "stop_atr": 3.0,
+          "oos_sharpe": -0.421
+        },
+        {
+          "fold": 2,
+          "lookbacks": [
+            20,
+            80,
+            240
+          ],
+          "mode": "trend",
+          "er": 0.25,
+          "stop_atr": 3.0,
+          "oos_sharpe": 0.546
+        },
+        {
+          "fold": 3,
+          "lookbacks": [
+            10,
+            40,
+            120
+          ],
+          "mode": "trend",
+          "er": 0.35,
+          "stop_atr": 3.0,
+          "oos_sharpe": -0.96
+        },
+        {
+          "fold": 4,
+          "lookbacks": [
+            20,
+            80,
+            240
+          ],
+          "mode": "trend",
+          "er": 0.25,
+          "stop_atr": 3.0,
+          "oos_sharpe": -0.463
+        }
+      ]
+    },
+    {
+      "hypothesis": "wide_stop_correct_rr",
+      "rationale": "GaganEA required a 71.5% win rate to break even because its first target closed 65% of the position at 0.32R. Tests whether a correct reward:risk profile (wide stops, let winners run) changes the outcome on the same instrument.",
+      "configs": 4,
+      "oos_bars": 1904,
+      "oos_years": 7.556,
+      "oos_sharpe": -0.096,
+      "oos_cagr": -0.947,
+      "max_drawdown_pct": -18.13,
+      "trades": 57,
+      "trades_per_day": 0.03,
+      "win_rate_pct": 26.32,
+      "profit_factor": 0.915,
+      "costs": 429.83,
+      "financing": 2906.95,
+      "cost_share_of_gross": null,
+      "deflated_vs_cumulative": -1.04,
+      "beats_hurdle": false,
+      "chosen_per_fold": [
+        {
+          "fold": 0,
+          "lookbacks": [
+            20,
+            60,
+            120
+          ],
+          "mode": "trend",
+          "er": 0.2,
+          "stop_atr": 0.0,
+          "oos_sharpe": -0.229
+        },
+        {
+          "fold": 1,
+          "lookbacks": [
+            20,
+            60,
+            120
+          ],
+          "mode": "trend",
+          "er": 0.2,
+          "stop_atr": 0.0,
+          "oos_sharpe": -0.372
+        },
+        {
+          "fold": 2,
+          "lookbacks": [
+            20,
+            60,
+            120
+          ],
+          "mode": "trend",
+          "er": 0.2,
+          "stop_atr": 0.0,
+          "oos_sharpe": -0.258
+        },
+        {
+          "fold": 3,
+          "lookbacks": [
+            20,
+            60,
+            120
+          ],
+          "mode": "trend",
+          "er": 0.2,
+          "stop_atr": 0.0,
+          "oos_sharpe": 0.239
+        },
+        {
+          "fold": 4,
+          "lookbacks": [
+            20,
+            60,
+            120
+          ],
+          "mode": "trend",
+          "er": 0.2,
+          "stop_atr": 0.0,
+          "oos_sharpe": -0.027
+        }
+      ]
+    }
+  ],
+  "verdict": "no hypothesis beat the hurdle"
+}
