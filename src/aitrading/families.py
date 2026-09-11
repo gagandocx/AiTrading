@@ -98,30 +98,58 @@ def atr_breakout(highs, lows, closes, lookback: int, mult: float) -> List[Num]:
 
 
 def opening_range_breakout(
-    times: Sequence[str], highs, lows, closes, range_bars: int
+    times: Sequence[str], highs, lows, closes, range_bars: int,
+    session_start_hour: int = 0, session_length_hours: Optional[int] = None,
 ) -> List[Num]:
     """Opening-range breakout: trade a break of the session's first N bars.
 
-    A genuinely intraday rule with its own published evidence, and structurally
-    different from the others here because it is anchored to the session clock
-    rather than to a rolling window. Flat until the opening range completes, and
-    flat again at the session end.
+    Anchored to the session clock rather than a rolling window, which is what
+    makes it structurally different from every other family here.
+
+    `session_start_hour` is in BROKER SERVER time and matters enormously. A naive
+    calendar-day grouping anchors the range to server 00:00, which on a UTC+3
+    broker is 17:00 New York -- the CME gold maintenance halt, the thinnest and
+    widest-spread half hour of the day. An "edge" measured there is more likely an
+    artifact of stale quotes than a real effect, so the anchor must be tested
+    explicitly against the sessions that actually matter (CME reopen, Tokyo,
+    London, New York).
+
+    `session_length_hours` optionally forces flat after the session ends.
     """
-    out: List[Num] = [None] * len(closes)
-    day_start = 0
-    cur_day = _day(times[0]) if times else ""
+    n = len(closes)
+    out: List[Num] = [None] * n
+    hours = [_hour(t) for t in times]
+
+    sess_start = None       # index where the current session began
     hi = lo = None
-    for i in range(len(closes)):
-        d = _day(times[i])
-        if d != cur_day:
-            cur_day, day_start, hi, lo = d, i, None, None
-        n_into = i - day_start
-        if n_into < range_bars:
-            out[i] = 0.0                       # still forming the range
+    prev_h = None
+    for i in range(n):
+        h = hours[i]
+        if h is None:
+            out[i] = 0.0
+            continue
+        # A new session begins the first time we observe the anchor hour after
+        # having been outside it.
+        if h == session_start_hour and prev_h != session_start_hour:
+            sess_start, hi, lo = i, None, None
+        prev_h = h
+
+        if sess_start is None:
+            out[i] = 0.0
+            continue
+
+        bars_in = i - sess_start
+        if bars_in < range_bars:
+            out[i] = 0.0                       # range still forming
             continue
         if hi is None:
-            hi = max(highs[day_start:day_start + range_bars])
-            lo = min(lows[day_start:day_start + range_bars])
+            hi = max(highs[sess_start:sess_start + range_bars])
+            lo = min(lows[sess_start:sess_start + range_bars])
+        if session_length_hours is not None:
+            elapsed_h = (h - session_start_hour) % 24
+            if elapsed_h >= session_length_hours:
+                out[i] = 0.0                   # session over, stand aside
+                continue
         if closes[i] > hi:
             out[i] = 1.0
         elif closes[i] < lo:
