@@ -21,6 +21,9 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# Belt and braces alongside conftest.py: pytest >= 7 honours this directly, and
+# older versions fall back to the conftest.py path insertion.
+pythonpath = ["src"]
 
 [tool.ruff]
 line-length = 100

@@ -127,3 +127,37 @@ def test_unknown_cycle_raises():
     from aitrading.research import hypotheses
     with pytest.raises(KeyError):
         hypotheses.get(999)
+
+
+
+def test_rerunning_identical_hypotheses_does_not_inflate_the_count(tmp_path):
+    """Verification must be free.
+
+    Re-running the same hypotheses on the same data examines no new
+    configurations. If that raised the hurdle, reproducing a result would make it
+    harder to prove -- penalising the one behaviour we most want to encourage.
+    """
+    led = Ledger.load(str(tmp_path / "l.json"))
+    led.record("cycle 2: mtf_alignment", 40, "D1", -0.10, 11.65)
+    assert led.cumulative_configs == 40
+
+    for _ in range(5):
+        led.record("cycle 2: mtf_alignment", 40, "D1", -0.10, 11.65)
+    assert led.cumulative_configs == 40, "re-runs must not accumulate"
+    assert len(led.cycles) == 1
+
+
+def test_genuinely_new_hypotheses_do_increment(tmp_path):
+    led = Ledger.load(str(tmp_path / "l.json"))
+    led.record("cycle 2: mtf_alignment", 40, "D1", -0.10, 11.65)
+    led.record("cycle 3: something new", 20, "D1", 0.4, 11.65)
+    assert led.cumulative_configs == 60
+    assert len(led.cycles) == 2
+
+
+def test_same_hypothesis_on_a_different_timeframe_counts_as_new(tmp_path):
+    """Testing the same idea on H1 after D1 IS additional search."""
+    led = Ledger.load(str(tmp_path / "l.json"))
+    led.record("trend baseline", 40, "D1", 0.2, 11.65)
+    led.record("trend baseline", 40, "H1", 0.9, 5.1)
+    assert led.cumulative_configs == 80

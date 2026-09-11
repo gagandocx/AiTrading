@@ -79,9 +79,29 @@ class Ledger:
         n = self.cumulative_configs + additional_configs
         return expected_max_sharpe(max(n, 1), se)
 
+    def find_identical(self, description: str, configs_tested: int,
+                       timeframe: str) -> Optional[CycleRecord]:
+        """Locate a prior cycle testing the same hypotheses on the same data."""
+        for c in self.cycles:
+            if (c.description == description and c.configs_tested == configs_tested
+                    and c.timeframe == timeframe):
+                return c
+        return None
+
     def record(self, description: str, configs_tested: int, timeframe: str,
                best_raw_sharpe: Optional[float], oos_years: float,
                notes: str = "") -> CycleRecord:
+        """Append a cycle, unless it is a re-run of an identical one.
+
+        Re-running the same hypotheses on the same data is verification, not new
+        search: it examines no configurations that were not already examined. If
+        it incremented the count, the hurdle would climb every time someone
+        reproduced a result, which would punish exactly the behaviour we want.
+        """
+        prior = self.find_identical(description, configs_tested, timeframe)
+        if prior is not None:
+            return prior
+
         cycle_hurdle = expected_max_sharpe(
             max(configs_tested, 1), (1.0 / oos_years) ** 0.5) if oos_years > 0 else 0.0
         cum_hurdle = self.hurdle(oos_years, additional_configs=configs_tested)

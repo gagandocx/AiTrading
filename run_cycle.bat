@@ -24,6 +24,9 @@ if "%TF%"=="" set TF=D1
 
 cd /d "%~dp0"
 
+REM Make src/ importable regardless of how Python was installed.
+set PYTHONPATH=%~dp0src;%PYTHONPATH%
+
 echo.
 echo [1/4] fetching latest strategy changes...
 git pull --rebase --autostash

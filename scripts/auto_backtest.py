@@ -82,9 +82,17 @@ def main() -> int:
 
     research_years = len(sp.research) / tf.bars_per_year
     planned = sum(h.size for h in hyps) * args.folds
-    hurdle = ledger.hurdle(research_years, additional_configs=planned)
-    print(f"  this cycle adds {planned:,} configs -> cumulative "
-          f"{ledger.cumulative_configs + planned:,}")
+    description = f"cycle {args.cycle}: " + ", ".join(h.name for h in hyps)
+    is_rerun = ledger.find_identical(description, planned, args.timeframe) is not None
+
+    if is_rerun:
+        print(f"  RE-RUN of an identical cycle: adds no new search, so the "
+              f"hurdle is unchanged")
+        hurdle = ledger.hurdle(research_years)
+    else:
+        hurdle = ledger.hurdle(research_years, additional_configs=planned)
+        print(f"  this cycle adds {planned:,} configs -> cumulative "
+              f"{ledger.cumulative_configs + planned:,}")
     print(f"  HURDLE to beat (deflated vs cumulative): Sharpe {hurdle:.2f}")
     print()
 
@@ -138,7 +146,7 @@ def main() -> int:
             best_overall = (h.name, sr)
 
     ledger.record(
-        description=f"cycle {args.cycle}: " + ", ".join(h.name for h in hyps),
+        description=description,
         configs_tested=planned, timeframe=args.timeframe,
         best_raw_sharpe=(best_overall[1] if best_overall else None),
         oos_years=research_years,
