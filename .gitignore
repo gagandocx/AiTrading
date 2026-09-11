@@ -1,0 +1,15 @@
+# Market data is not committed: it is broker-specific, often licensed, and large.
+data/*.csv
+data/*.json
+!data/README.md
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.DS_Store
