@@ -21,7 +21,7 @@ from . import costs as cost_model
 from .config import Instrument, StrategyConfig
 from .indicators import atr
 from .metrics import Performance, TradeStats
-from .signals import generate
+from .signals import SignalSeries, generate
 
 
 @dataclass
@@ -65,13 +65,29 @@ def run(
     cfg: StrategyConfig,
     tf: Timeframe,
     initial_equity: float = 10_000.0,
+    precomputed_signal: Optional[Sequence[Optional[float]]] = None,
 ) -> BacktestResult:
+    """Run a backtest.
+
+    `precomputed_signal` lets an external family (see families.py) supply the
+    exposure series directly, so alternative strategies share this engine's
+    execution, cost and risk handling rather than reimplementing it. It must obey
+    the same contract: element i uses information up to bar i's close only.
+    """
     n = len(bars)
     closes = [b.close for b in bars]
     highs = [b.high for b in bars]
     lows = [b.low for b in bars]
 
     sig = generate(closes, cfg)
+    if precomputed_signal is not None:
+        if len(precomputed_signal) != n:
+            raise ValueError(
+                f"precomputed_signal has {len(precomputed_signal)} entries "
+                f"but there are {n} bars")
+        sig = SignalSeries(signal=list(precomputed_signal),
+                           vol_per_bar=sig.vol_per_bar,
+                           efficiency=sig.efficiency, raw_score=sig.raw_score)
     atr_series = atr(highs, lows, closes, cfg.atr_window) if cfg.stop_atr_multiple > 0 else [None] * n
 
     from .sizing import should_rebalance, target_lots  # local import: avoids cycle
