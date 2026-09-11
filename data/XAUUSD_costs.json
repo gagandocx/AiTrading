@@ -1,0 +1,13 @@
+{
+  "symbol": "XAUUSD",
+  "contract_size": 100.0,
+  "digits": 2,
+  "min_lot": 0.01,
+  "lot_step": 0.01,
+  "max_lot": 100.0,
+  "median_spread": 0.06000000000040018,
+  "mean_spread": 0.059666666666726084,
+  "p90_spread": 0.06999999999970896,
+  "half_spread_suggested": 0.03000000000020009,
+  "samples": 60
+}
