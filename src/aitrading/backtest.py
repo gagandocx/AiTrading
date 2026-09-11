@@ -44,7 +44,9 @@ class Timeframe:
 TF_D1 = Timeframe("D1", 24.0, 252.0)
 TF_H4 = Timeframe("H4", 4.0, 252.0 * 6)
 TF_H1 = Timeframe("H1", 1.0, 252.0 * 23)
-TIMEFRAMES = {"D1": TF_D1, "H4": TF_H4, "H1": TF_H1}
+TF_M5 = Timeframe("M5", 5.0 / 60.0, 252.0 * 276)
+TF_M1 = Timeframe("M1", 1.0 / 60.0, 252.0 * 1380)
+TIMEFRAMES = {"D1": TF_D1, "H4": TF_H4, "H1": TF_H1, "M5": TF_M5, "M1": TF_M1}
 
 
 @dataclass
