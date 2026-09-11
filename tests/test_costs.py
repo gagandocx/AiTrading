@@ -59,3 +59,16 @@ def test_zero_cost_instrument_is_frictionless():
                    swap_long_annual=0.0, swap_short_annual=0.0)
     assert execute(free, 3500.0, 1.0).total == 0.0
     assert breakeven_move(free) == 0.0
+
+
+
+def test_intraday_export_spans_are_capped():
+    """A request for 15 years of M1 must be clamped: 5.2M bars add nothing to an
+    edge estimate, whose precision depends on calendar span not sampling rate."""
+    from aitrading.data.mt5_source import span_for
+
+    assert span_for("D1", 15.0) == 15.0        # full span honoured
+    assert span_for("M1", 15.0) < 0.1          # capped to ~1 month
+    assert span_for("M5", 15.0) < 0.3          # capped to ~3 months
+    assert span_for("M1", 0.01) == 0.01        # a smaller request is respected
+    assert span_for("H4", 15.0) == 15.0

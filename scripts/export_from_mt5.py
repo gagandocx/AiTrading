@@ -51,12 +51,30 @@ def main() -> int:
 
         if not args.costs_only:
             for tf in args.timeframes:
-                bars = mt5_source.fetch(symbol, tf, years=args.years)
+                span = mt5_source.span_for(tf, args.years)
+                if span < args.years:
+                    print(f"  {tf:>3}: capping span to {span * 365:.0f} days "
+                          f"(intraday data is for cost calibration, not edge testing)")
+                bars = mt5_source.fetch(symbol, tf, years=span)
                 path = outdir / f"{args.symbol}_{tf}.csv"
                 csv_source.save(bars, str(path))
+                mb = path.stat().st_size / 1e6
                 print(f"  {tf:>3}: {len(bars):>7,} bars  "
-                      f"{bars[0].time} -> {bars[-1].time}  -> {path.name}")
-                if len(bars) < 1200:
+                      f"{bars[0].time} -> {bars[-1].time}  "
+                      f"({mb:.1f} MB) -> {path.name}")
+
+                # Warn when the export is too short to be useful for its purpose.
+                if tf == "D1":
+                    years_got = len(bars) / 252.0
+                    if years_got < 8:
+                        print(f"       WARNING: only ~{years_got:.1f} years of D1. The edge")
+                        print(f"       test wants 15+. Open a {symbol} D1 chart, hold Home")
+                        print(f"       to force a full download, then re-run.")
+                    else:
+                        se = (1.0 / years_got) ** 0.5
+                        print(f"       ~{years_got:.1f} years -> Sharpe standard error "
+                              f"{se:.2f}. Good.")
+                elif len(bars) < 5000:
                     print(f"       WARNING: only {len(bars)} bars. Open a {symbol} {tf} "
                           f"chart in MT5, press Home to scroll back, then re-run.")
 

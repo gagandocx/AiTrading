@@ -17,6 +17,27 @@ from ..backtest import Bar
 _TF_NAMES = {"M1": "TIMEFRAME_M1", "M5": "TIMEFRAME_M5", "M15": "TIMEFRAME_M15",
              "H1": "TIMEFRAME_H1", "H4": "TIMEFRAME_H4", "D1": "TIMEFRAME_D1"}
 
+# Maximum span worth downloading per timeframe, in years.
+#
+# Intraday data is for calibrating execution costs, not for estimating edge --
+# the standard error of a Sharpe estimate depends on calendar span, not on
+# sampling frequency, so 15 years of M1 (5.2M bars) buys nothing over 15 years
+# of D1 (3.8k bars). These caps stop an innocent "--years 15" from requesting
+# millions of rows that serve no purpose.
+_MAX_YEARS = {
+    "M1": 30.0 / 365.0,    # ~1 month
+    "M5": 90.0 / 365.0,    # ~3 months
+    "M15": 1.0,
+    "H1": 5.0,
+    "H4": 20.0,
+    "D1": 40.0,
+}
+
+
+def span_for(timeframe: str, requested_years: float) -> float:
+    """Clamp a requested span to something sensible for the timeframe."""
+    return min(requested_years, _MAX_YEARS.get(timeframe, requested_years))
+
 
 def _require_mt5():
     try:
