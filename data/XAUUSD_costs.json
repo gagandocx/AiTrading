@@ -1,0 +1,18 @@
+{
+  "symbol": "XAUUSD",
+  "contract_size": 100.0,
+  "digits": 2,
+  "min_lot": 0.01,
+  "lot_step": 0.01,
+  "max_lot": 100.0,
+  "median_spread": 0.06,
+  "mean_spread": 0.0596666666,
+  "p90_spread": 0.07,
+  "half_spread_suggested": 0.03,
+  "slippage": 0.005,
+  "commission_per_lot_per_side": 3.00,
+  "swap_long_annual": 0.045,
+  "swap_short_annual": 0.010,
+  "samples": 60,
+  "_note": "spread measured over 60s in calm conditions; commission derived from account History (0.01 lots charged $0.06 round turn -> $3.00/lot/side)"
+}
