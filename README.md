@@ -15,12 +15,60 @@ anywhere. MT5 is needed only for live data and execution.
 | Cost model (spread, slippage, commission, financing) | Built and validated |
 | Backtest engine (no look-ahead, exact accounting) | Built and validated |
 | Purged walk-forward with multiple-testing correction | Built |
-| MT5 data export + cost measurement | Built, untested against a live terminal |
-| MT5 live execution | **Not built yet** |
-| **Performance on real XAUUSD** | **UNKNOWN — no real data yet** |
+| MT5 data export + cost measurement | Built and used |
+| MT5 live execution + risk gate | Built, demo-enforced, 81 tests passing |
+| **Edge on real XAUUSD (16.6 years)** | **NONE — deflated Sharpe −0.52** |
 
-The engine is validated. Its edge is not. Those are different claims, and the
-second one requires your broker's history.
+See **`docs/results/xauusd-findings.md`** for the full measured results. Summary:
+the D1 trend signal shows no statistically credible edge, high-frequency trading
+loses ~50%/yr to friction, and a $1,000 account cannot size gold safely.
+
+---
+
+## Live bot
+
+```bash
+# observe only, no orders sent
+python scripts\run_live.py --dry-run
+
+# armed, DEMO account only
+python scripts\run_live.py --timeframe M5 --preset balanced
+```
+
+Refuses real-money accounts unless `--i-understand-live-risk` is passed
+explicitly. Nothing in this repo sets that flag.
+
+### Frequency presets, mapped to measured outcomes
+
+| Preset | Trades/day | Return (22d) | Max DD | Friction ÷ gross |
+|---|---|---|---|---|
+| `ultra` | 282.7 | −9.73% | −10.42% | 7.57 |
+| `veryfast` | 193.8 | −7.59% | −8.52% | — |
+| `fast` | 104.6 | −3.83% | −6.01% | 39.30 |
+| **`balanced`** (default) | **53.0** | **+0.11%** | **−2.17%** | **0.94** |
+| `calm` | 27.3 | −0.79% | −3.38% | 10.10 |
+
+Higher frequency was worse on **both** return and drawdown at every step. Even
+`balanced` is statistically indistinguishable from zero over 22 days — it is the
+least-bad point on the curve, not a validated edge.
+
+### Risk gate
+
+Every order passes `RiskManager.evaluate()`, which fails **closed**:
+
+- daily loss limit → blocks for the session; drawdown limit → sticky HALT
+- **spread guard** (absolute + multiple-of-median) — the highest-value control at
+  speed, since gold's spread goes from $0.06 to $1.00+ around CPI/NFP/FOMC
+- blocked session hours (rollover), news blackout window
+- trade-count cap, consecutive-loss halt, post-loss cooldown
+- position caps by both lots and leverage; oversized orders are **reduced**, not refused
+
+### On a $1,000 account it will not trade, by design
+
+Prudent sizing at 2× leverage gives 0.0046 lots. Your broker's minimum is 0.01.
+The gate therefore blocks every order. To make it trade you must explicitly pass
+`--max-leverage 4.4` or higher, which is you choosing ~71% annualised volatility.
+The bot will not make that choice quietly on your behalf.
 
 ---
 
