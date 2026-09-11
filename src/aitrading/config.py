@@ -113,6 +113,12 @@ class StrategyConfig:
     max_leverage: float = 3.0  # cap on notional / equity
     risk_per_trade_cap: float = 0.02  # max fraction of equity at 1 daily sigma
 
+    # Signal family. "trend" is time-series momentum. "reversal" inverts it to
+    # trade short-horizon mean reversion. "long_only_trend" clips shorts to zero,
+    # which is a distinct hypothesis for an asset with a structural upward drift
+    # (gold's buy-and-hold Sharpe over 2021-2026 was 1.06).
+    signal_mode: str = "trend"  # trend | reversal | long_only_trend
+
     # Chop filter: Kaufman efficiency ratio over `er_window` bars must exceed
     # `er_threshold` to take a position. Directly targets the failure mode of
     # trend systems on a single mean-reverting instrument.

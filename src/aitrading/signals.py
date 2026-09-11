@@ -86,9 +86,25 @@ def generate(
         shaped = math.tanh(cfg.signal_scale * blended)
         shaped = max(-cfg.max_signal, min(cfg.max_signal, shaped))
 
+        if cfg.signal_mode == "reversal":
+            # Short-horizon mean reversion: bet against the recent move. The
+            # efficiency filter is inverted for this mode, since reversion wants
+            # choppy conditions, not clean trends.
+            shaped = -shaped
+        elif cfg.signal_mode == "long_only_trend":
+            shaped = max(0.0, shaped)
+        elif cfg.signal_mode != "trend":
+            raise ValueError(f"unknown signal_mode {cfg.signal_mode!r}")
+
         if cfg.use_efficiency_filter:
             e = er[i]
-            if e is None or e < cfg.er_threshold:
+            if e is None:
+                shaped = 0.0
+            elif cfg.signal_mode == "reversal":
+                # trade reversion only when the market is NOT trending
+                if e > cfg.er_threshold:
+                    shaped = 0.0
+            elif e < cfg.er_threshold:
                 shaped = 0.0
 
         signal[i] = shaped
