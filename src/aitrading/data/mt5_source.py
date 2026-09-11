@@ -25,11 +25,18 @@ _TF_NAMES = {"M1": "TIMEFRAME_M1", "M5": "TIMEFRAME_M5", "M15": "TIMEFRAME_M15",
 # of D1 (3.8k bars). These caps stop an innocent "--years 15" from requesting
 # millions of rows that serve no purpose.
 _MAX_YEARS = {
+    # M1/M5 remain capped: they exist to measure the spread and slippage
+    # distribution, and a month of that is plenty. Years of M1 would be millions
+    # of rows serving no purpose.
     "M1": 30.0 / 365.0,    # ~1 month
     "M5": 90.0 / 365.0,    # ~3 months
-    "M15": 1.0,
-    "H1": 5.0,
-    "H4": 20.0,
+    # M15/H1/H4 are used for EDGE ESTIMATION on intraday strategies in the
+    # 5-20 trades/day band, so span is the binding constraint on whether the
+    # test can conclude anything (Sharpe SE = 1/sqrt(years)). Take everything
+    # the broker will give: 15 years of H1 is ~87k rows, which is trivial.
+    "M15": 5.0,
+    "H1": 15.0,
+    "H4": 25.0,
     "D1": 40.0,
 }
 
