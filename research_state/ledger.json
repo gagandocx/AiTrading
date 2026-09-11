@@ -71,8 +71,20 @@
       "best_deflated_vs_cumulative": -1.0443875619881284,
       "oos_years": 11.65,
       "notes": "GaganEA salvage, both negative"
+    },
+    {
+      "cycle": 7,
+      "timestamp": 1789129536.6798754,
+      "description": "cycle 3: donchian_breakout_m5, donchian_trailing_exit_m5",
+      "configs_tested": 40,
+      "timeframe": "M5",
+      "best_raw_sharpe": 0.9652441385121965,
+      "best_deflated_vs_cycle": -3.800132054603763,
+      "best_deflated_vs_cumulative": -6.695238298375298,
+      "oos_years": 0.1779100529100529,
+      "notes": "2 hypotheses completed"
     }
   ],
-  "cumulative_configs": 1448,
+  "cumulative_configs": 1488,
   "warning": "APPEND-ONLY. Deleting entries invalidates every subsequent significance claim."
 }

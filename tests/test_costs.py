@@ -62,13 +62,28 @@ def test_zero_cost_instrument_is_frictionless():
 
 
 
-def test_intraday_export_spans_are_capped():
-    """A request for 15 years of M1 must be clamped: 5.2M bars add nothing to an
-    edge estimate, whose precision depends on calendar span not sampling rate."""
+def test_export_spans_allow_enough_intraday_history_to_resolve_an_edge():
+    """M1/M5 caps must permit a testable span, not just a spread sample.
+
+    Sharpe standard error is 1/sqrt(years), so a 3-month intraday sample (SE 2.0)
+    cannot resolve any realistic edge. These caps were originally set on the
+    assumption that intraday data existed only to measure spread; once M1/M5
+    became the target trading timeframes, span became the binding constraint.
+    """
     from aitrading.data.mt5_source import span_for
 
-    assert span_for("D1", 15.0) == 15.0        # full span honoured
-    assert span_for("M1", 15.0) < 0.1          # capped to ~1 month
-    assert span_for("M5", 15.0) < 0.3          # capped to ~3 months
-    assert span_for("M1", 0.01) == 0.01        # a smaller request is respected
+    assert span_for("D1", 15.0) == 15.0
     assert span_for("H4", 15.0) == 15.0
+    # M5 must reach a span where a single pre-registered config is testable:
+    # 2 years -> SE 0.71 -> significant at Sharpe ~1.4.
+    assert span_for("M5", 15.0) >= 2.0
+    assert span_for("M1", 15.0) >= 1.0
+    assert span_for("M5", 0.25) == 0.25        # a smaller request is respected
+
+
+def test_intraday_span_still_bounded_to_keep_files_manageable():
+    """Unbounded M1 would be tens of millions of rows for no added precision."""
+    from aitrading.data.mt5_source import span_for
+
+    assert span_for("M1", 50.0) <= 1.0         # ~348k rows, ~20 MB
+    assert span_for("M5", 50.0) <= 5.0

@@ -90,9 +90,52 @@ def cycle_02() -> List[Hypothesis]:
     ]
 
 
+# --------------------------------------------------------------------------
+# CYCLE 3 -- Donchian breakout on M5.
+#
+# Earned a proper test by exploratory result: on 22 days of resampled M5, the
+# breakout family was strongest and appeared repeatedly across different
+# lookbacks (rather than one configuration spiking), and M5 beat M1 on both best
+# return and hit rate (30/48 vs 14/48 profitable). Breakout is also a genuinely
+# distinct hypothesis from momentum -- a threshold event on the price extreme
+# rather than a continuous function of recent return -- with long-standing
+# out-of-sample history as the Turtle rule.
+#
+# Grid kept to 8 configs: two families x four entry windows. Every extra config
+# raises the cumulative hurdle, and on 0.25 years the hurdle is already steep.
+# --------------------------------------------------------------------------
+def cycle_03() -> List[Hypothesis]:
+    windows = [[3, 9, 18], [6, 18, 36], [12, 36, 72], [24, 72, 144]]
+    return [
+        Hypothesis(
+            name="donchian_breakout_m5",
+            rationale="Donchian channel breakout, the classic Turtle rule. Selected "
+                      "because it was the strongest family in M5 exploration and was "
+                      "robust across lookbacks rather than dependent on one config. "
+                      "Threshold-on-extreme is a different mechanism from momentum.",
+            grid=[_cfg(lookbacks=w, signal_mode="breakout", signal_scale=1.5,
+                       min_rebalance_lots=0.01, min_signal_change=0.05,
+                       vol_halflife=max(10, w[0] * 3), stop_atr_multiple=2.0)
+                  for w in windows],
+        ),
+        Hypothesis(
+            name="donchian_trailing_exit_m5",
+            rationale="The original two-window Turtle design: breakout entry held "
+                      "until an opposite shorter channel breaks, rather than exiting "
+                      "on signal decay. Tests whether the exit rule, not the entry, "
+                      "is what carries the family's performance.",
+            grid=[_cfg(lookbacks=w, signal_mode="donchian_exit", signal_scale=1.5,
+                       min_rebalance_lots=0.01, min_signal_change=0.05,
+                       vol_halflife=max(10, w[0] * 3), stop_atr_multiple=2.0)
+                  for w in windows],
+        ),
+    ]
+
+
 CYCLES: Dict[int, Callable[[], List[Hypothesis]]] = {
     1: cycle_01,
     2: cycle_02,
+    3: cycle_03,
 }
 
 

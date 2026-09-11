@@ -25,11 +25,15 @@ _TF_NAMES = {"M1": "TIMEFRAME_M1", "M5": "TIMEFRAME_M5", "M15": "TIMEFRAME_M15",
 # of D1 (3.8k bars). These caps stop an innocent "--years 15" from requesting
 # millions of rows that serve no purpose.
 _MAX_YEARS = {
-    # M1/M5 remain capped: they exist to measure the spread and slippage
-    # distribution, and a month of that is plenty. Years of M1 would be millions
-    # of rows serving no purpose.
-    "M1": 30.0 / 365.0,    # ~1 month
-    "M5": 90.0 / 365.0,    # ~3 months
+    # M1/M5 are capped only by file size, not by purpose. These were originally
+    # limited to a month on the assumption that intraday data existed solely to
+    # measure spread. That was wrong once M1/M5 became the target trading
+    # timeframes: span is what determines whether a result can be resolved at all
+    # (Sharpe SE = 1/sqrt(years)), so take whatever the broker holds.
+    #   M1, 1 year  ~= 348k rows ~= 20 MB
+    #   M5, 5 years ~= 348k rows ~= 20 MB
+    "M1": 1.0,
+    "M5": 5.0,
     # M15/H1/H4 are used for EDGE ESTIMATION on intraday strategies in the
     # 5-20 trades/day band, so span is the binding constraint on whether the
     # test can conclude anything (Sharpe SE = 1/sqrt(years)). Take everything
