@@ -48,3 +48,26 @@ def validate(bars: List[Bar]) -> None:
             raise ValueError(f"bar {i} ({b.time}): OHLC inconsistent {b}")
         if b.low <= 0:
             raise ValueError(f"bar {i} ({b.time}): non-positive price")
+
+
+
+def resample(bars: List[Bar], factor: int) -> List[Bar]:
+    """Aggregate bars into a coarser timeframe (e.g. M1 -> M5 with factor=5).
+
+    Open is the first bar's open, close the last bar's close, high/low the
+    extremes. Only complete groups are emitted, so a partial trailing group is
+    discarded rather than producing a bar that spans less time than it claims.
+    """
+    if factor < 2:
+        raise ValueError("factor must be >= 2")
+    out: List[Bar] = []
+    for i in range(0, len(bars) - factor + 1, factor):
+        g = bars[i:i + factor]
+        out.append(Bar(
+            time=g[0].time,
+            open=g[0].open,
+            high=max(b.high for b in g),
+            low=min(b.low for b in g),
+            close=g[-1].close,
+        ))
+    return out

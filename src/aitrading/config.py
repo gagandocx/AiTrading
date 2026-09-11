@@ -113,11 +113,31 @@ class StrategyConfig:
     max_leverage: float = 3.0  # cap on notional / equity
     risk_per_trade_cap: float = 0.02  # max fraction of equity at 1 daily sigma
 
-    # Signal family. "trend" is time-series momentum. "reversal" inverts it to
-    # trade short-horizon mean reversion. "long_only_trend" clips shorts to zero,
-    # which is a distinct hypothesis for an asset with a structural upward drift
-    # (gold's buy-and-hold Sharpe over 2021-2026 was 1.06).
-    signal_mode: str = "trend"  # trend | reversal | long_only_trend
+    # Signal family. Each is a genuinely distinct hypothesis, not a reparameterisation:
+    #
+    #   trend            time-series momentum (Moskowitz/Ooi/Pedersen)
+    #   reversal         momentum inverted -- short-horizon mean reversion
+    #   long_only_trend  shorts clipped, for an asset with structural upward drift
+    #   breakout         Donchian channel break (the classic Turtle rule)
+    #   bollinger        counter-trend entry only at a volatility extreme, exit at
+    #                    the mean. Distinct from `reversal`: threshold-triggered
+    #                    rather than continuously proportional to recent return.
+    #   donchian_exit    breakout entry with an opposite-channel trailing exit
+    signal_mode: str = "trend"
+
+    # Entry threshold in standard deviations for the `bollinger` family.
+    entry_z: float = 2.0
+    # Exit band for `bollinger`: flatten once |z| falls below this.
+    exit_z: float = 0.5
+
+    # Force flat outside these broker-server hours (inclusive start, exclusive end).
+    # (0, 24) disables. Intraday-only operation avoids overnight financing, which
+    # measured 6.8x transaction costs on multi-week gold holds.
+    session_hours: tuple = (0, 24)
+    # Close everything before the daily rollover hour and stay flat until the next
+    # session. This is the direct test of whether financing is the binding cost.
+    close_before_rollover: bool = False
+    rollover_hour: int = 23
 
     # Chop filter: Kaufman efficiency ratio over `er_window` bars must exceed
     # `er_threshold` to take a position. Directly targets the failure mode of

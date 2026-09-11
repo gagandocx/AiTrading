@@ -44,9 +44,11 @@ class Timeframe:
 TF_D1 = Timeframe("D1", 24.0, 252.0)
 TF_H4 = Timeframe("H4", 4.0, 252.0 * 6)
 TF_H1 = Timeframe("H1", 1.0, 252.0 * 23)
+TF_M15 = Timeframe("M15", 15.0 / 60.0, 252.0 * 92)
 TF_M5 = Timeframe("M5", 5.0 / 60.0, 252.0 * 276)
 TF_M1 = Timeframe("M1", 1.0 / 60.0, 252.0 * 1380)
-TIMEFRAMES = {"D1": TF_D1, "H4": TF_H4, "H1": TF_H1, "M5": TF_M5, "M1": TF_M1}
+TIMEFRAMES = {"D1": TF_D1, "H4": TF_H4, "H1": TF_H1,
+              "M15": TF_M15, "M5": TF_M5, "M1": TF_M1}
 
 
 @dataclass
@@ -122,7 +124,21 @@ def run(
         v = sig.vol_per_bar[i - 1]
         txn = 0.0
 
-        if halted:
+        # Session gating. Applied here, not in the signal, because it depends on
+        # bar timestamps rather than price. Forces flat outside the permitted
+        # window and before the daily rollover, which is the direct test of
+        # whether overnight financing is the binding cost.
+        session_ok = True
+        if cfg.close_before_rollover or cfg.session_hours != (0, 24):
+            hour = _bar_hour(bar.time)
+            if hour is not None:
+                lo, hi = cfg.session_hours
+                if not (lo <= hour < hi):
+                    session_ok = False
+                if cfg.close_before_rollover and hour >= cfg.rollover_hour:
+                    session_ok = False
+
+        if halted or not session_ok:
             desired = 0.0
         elif s is None or v is None:
             desired = lots_before
@@ -224,3 +240,16 @@ def run(
     return BacktestResult(
         performance=perf, lots=lots_hist, signal=sig.signal, equity=perf.equity_curve
     )
+
+
+
+def _bar_hour(timestamp: str) -> Optional[int]:
+    """Extract the hour from a 'YYYY-MM-DD HH:MM:SS' bar timestamp.
+
+    Returns None for synthetic bars (e.g. 't1', 't2') so session gating is simply
+    inert on generated data rather than raising.
+    """
+    try:
+        return int(timestamp.split(" ")[1].split(":")[0])
+    except (IndexError, ValueError):
+        return None
