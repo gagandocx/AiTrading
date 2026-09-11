@@ -1,0 +1,193 @@
+{
+  "cycle": 3,
+  "timestamp": 1789129536.680418,
+  "machine": "ip-10-1-110-69.us-east-1.compute.internal",
+  "timeframe": "M5",
+  "csv": "XAUUSD_M5.csv",
+  "total_bars": 17678,
+  "research_bars": 12374,
+  "lockbox_bars": 5304,
+  "research_end": "2026-08-17 00:55:00",
+  "lockbox_start": "2026-08-17 01:00:00",
+  "lockbox_still_sealed": true,
+  "instrument": {
+    "symbol": "XAUUSD",
+    "contract_size": 100.0,
+    "digits": 2,
+    "min_lot": 0.01,
+    "lot_step": 0.01,
+    "max_lot": 100.0,
+    "half_spread": 0.03,
+    "commission_per_lot_per_side": 3.0,
+    "slippage": 0.005,
+    "swap_long_annual": 0.045,
+    "swap_short_annual": 0.01
+  },
+  "cumulative_configs_after": 1488,
+  "hurdle": 7.66,
+  "results": [
+    {
+      "hypothesis": "donchian_breakout_m5",
+      "rationale": "Donchian channel breakout, the classic Turtle rule. Selected because it was the strongest family in M5 exploration and was robust across lookbacks rather than dependent on one config. Threshold-on-extreme is a different mechanism from momentum.",
+      "configs": 4,
+      "oos_bars": 8039,
+      "oos_years": 0.116,
+      "oos_sharpe": 0.948,
+      "oos_cagr": 4.235,
+      "max_drawdown_pct": -1.7,
+      "trades": 293,
+      "trades_per_day": 10.059,
+      "win_rate_pct": 34.81,
+      "profit_factor": 1.082,
+      "costs": 592.63,
+      "financing": 9.9,
+      "cost_share_of_gross": 0.698,
+      "deflated_vs_cumulative": -6.712,
+      "beats_hurdle": false,
+      "chosen_per_fold": [
+        {
+          "fold": 0,
+          "lookbacks": [
+            12,
+            36,
+            72
+          ],
+          "mode": "breakout",
+          "er": 0.2,
+          "stop_atr": 2.0,
+          "oos_sharpe": 9.5
+        },
+        {
+          "fold": 1,
+          "lookbacks": [
+            6,
+            18,
+            36
+          ],
+          "mode": "breakout",
+          "er": 0.2,
+          "stop_atr": 2.0,
+          "oos_sharpe": 6.243
+        },
+        {
+          "fold": 2,
+          "lookbacks": [
+            12,
+            36,
+            72
+          ],
+          "mode": "breakout",
+          "er": 0.2,
+          "stop_atr": 2.0,
+          "oos_sharpe": -0.717
+        },
+        {
+          "fold": 3,
+          "lookbacks": [
+            6,
+            18,
+            36
+          ],
+          "mode": "breakout",
+          "er": 0.2,
+          "stop_atr": 2.0,
+          "oos_sharpe": -2.458
+        },
+        {
+          "fold": 4,
+          "lookbacks": [
+            12,
+            36,
+            72
+          ],
+          "mode": "breakout",
+          "er": 0.2,
+          "stop_atr": 2.0,
+          "oos_sharpe": -5.955
+        }
+      ]
+    },
+    {
+      "hypothesis": "donchian_trailing_exit_m5",
+      "rationale": "The original two-window Turtle design: breakout entry held until an opposite shorter channel breaks, rather than exiting on signal decay. Tests whether the exit rule, not the entry, is what carries the family's performance.",
+      "configs": 4,
+      "oos_bars": 8039,
+      "oos_years": 0.116,
+      "oos_sharpe": 0.965,
+      "oos_cagr": 6.371,
+      "max_drawdown_pct": -1.74,
+      "trades": 216,
+      "trades_per_day": 7.416,
+      "win_rate_pct": 37.04,
+      "profit_factor": 1.07,
+      "costs": 488.82,
+      "financing": 30.63,
+      "cost_share_of_gross": 0.6,
+      "deflated_vs_cumulative": -6.695,
+      "beats_hurdle": false,
+      "chosen_per_fold": [
+        {
+          "fold": 0,
+          "lookbacks": [
+            3,
+            9,
+            18
+          ],
+          "mode": "donchian_exit",
+          "er": 0.2,
+          "stop_atr": 2.0,
+          "oos_sharpe": 2.279
+        },
+        {
+          "fold": 1,
+          "lookbacks": [
+            3,
+            9,
+            18
+          ],
+          "mode": "donchian_exit",
+          "er": 0.2,
+          "stop_atr": 2.0,
+          "oos_sharpe": 5.648
+        },
+        {
+          "fold": 2,
+          "lookbacks": [
+            3,
+            9,
+            18
+          ],
+          "mode": "donchian_exit",
+          "er": 0.2,
+          "stop_atr": 2.0,
+          "oos_sharpe": -4.916
+        },
+        {
+          "fold": 3,
+          "lookbacks": [
+            3,
+            9,
+            18
+          ],
+          "mode": "donchian_exit",
+          "er": 0.2,
+          "stop_atr": 2.0,
+          "oos_sharpe": 0.032
+        },
+        {
+          "fold": 4,
+          "lookbacks": [
+            3,
+            9,
+            18
+          ],
+          "mode": "donchian_exit",
+          "er": 0.2,
+          "stop_atr": 2.0,
+          "oos_sharpe": 2.517
+        }
+      ]
+    }
+  ],
+  "verdict": "no hypothesis beat the hurdle"
+}

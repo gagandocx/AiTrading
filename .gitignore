@@ -13,3 +13,5 @@ dist/
 .venv/
 venv/
 .DS_Store
+reports/
+!reports/*.json

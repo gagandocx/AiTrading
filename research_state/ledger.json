@@ -1,0 +1,90 @@
+{
+  "cycles": [
+    {
+      "cycle": 1,
+      "timestamp": 1789128126.8508534,
+      "description": "D1 trend walk-forward (5 folds x 18 configs)",
+      "configs_tested": 90,
+      "timeframe": "D1",
+      "best_raw_sharpe": 0.19,
+      "best_deflated_vs_cycle": -0.38124091708574886,
+      "best_deflated_vs_cumulative": -0.38124091708574886,
+      "oos_years": 16.6,
+      "notes": "deflated -0.52, noise"
+    },
+    {
+      "cycle": 2,
+      "timestamp": 1789128126.8508632,
+      "description": "swap-rate sensitivity sweep (5 x 90)",
+      "configs_tested": 450,
+      "timeframe": "D1",
+      "best_raw_sharpe": 0.44,
+      "best_deflated_vs_cycle": -0.26553771252699027,
+      "best_deflated_vs_cumulative": -0.2794525521689238,
+      "oos_years": 16.6,
+      "notes": "noise even at zero financing"
+    },
+    {
+      "cycle": 3,
+      "timestamp": 1789128126.8508701,
+      "description": "H1 frequency sweep, 6 speed bands",
+      "configs_tested": 180,
+      "timeframe": "H1",
+      "best_raw_sharpe": 1.17,
+      "best_deflated_vs_cycle": 0.030011268319174,
+      "best_deflated_vs_cumulative": -0.1668006298203879,
+      "oos_years": 5.1,
+      "notes": "best 1.3/day, deflated +0.03, lost to buy-and-hold"
+    },
+    {
+      "cycle": 4,
+      "timestamp": 1789128126.850879,
+      "description": "M1 HFT configuration search",
+      "configs_tested": 648,
+      "timeframe": "M1",
+      "best_raw_sharpe": null,
+      "best_deflated_vs_cycle": null,
+      "best_deflated_vs_cumulative": null,
+      "oos_years": 0.09,
+      "notes": "190 trades/day: -6.1% in 22d, friction 4.54x gross"
+    },
+    {
+      "cycle": 5,
+      "timestamp": 1789128126.8508852,
+      "description": "reversal + long_only_trend hypotheses",
+      "configs_tested": 40,
+      "timeframe": "D1",
+      "best_raw_sharpe": 0.31,
+      "best_deflated_vs_cycle": -0.18333666229337198,
+      "best_deflated_vs_cumulative": -0.47919068348671384,
+      "oos_years": 16.6,
+      "notes": "reversal dead; long-only was bull beta"
+    },
+    {
+      "cycle": 6,
+      "timestamp": 1789128126.8508906,
+      "description": "cycle 2: mtf_alignment, wide_stop_correct_rr",
+      "configs_tested": 40,
+      "timeframe": "D1",
+      "best_raw_sharpe": -0.1,
+      "best_deflated_vs_cycle": -0.6888903972888728,
+      "best_deflated_vs_cumulative": -1.0443875619881284,
+      "oos_years": 11.65,
+      "notes": "GaganEA salvage, both negative"
+    },
+    {
+      "cycle": 7,
+      "timestamp": 1789129536.6798754,
+      "description": "cycle 3: donchian_breakout_m5, donchian_trailing_exit_m5",
+      "configs_tested": 40,
+      "timeframe": "M5",
+      "best_raw_sharpe": 0.9652441385121965,
+      "best_deflated_vs_cycle": -3.800132054603763,
+      "best_deflated_vs_cumulative": -6.695238298375298,
+      "oos_years": 0.1779100529100529,
+      "notes": "2 hypotheses completed"
+    }
+  ],
+  "cumulative_configs": 1488,
+  "warning": "APPEND-ONLY. Deleting entries invalidates every subsequent significance claim."
+}
